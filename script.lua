@@ -1,23 +1,152 @@
-local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+-- FIX GUI TRÙNG (QUAN TRỌNG)
+pcall(function()
+	local old = game.CoreGui:FindFirstChild("TTAM_GUI")
+	if old then old:Destroy() end
+end)
 
-local function decode(data)
-	data = string.gsub(data, '[^'..b..'=]', '')
-	return (data:gsub('.', function(x)
-		if (x == '=') then return '' end
-		local r,f='',(b:find(x)-1)
-		for i=6,1,-1 do
-			r = r .. (f%2^i-f%2^(i-1)>0 and '1' or '0')
-		end
-		return r
-	end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
-		if (#x ~= 8) then return '' end
-		local c=0
-		for i=1,8 do
-			c = c + (x:sub(i,i)=='1' and 2^(8-i) or 0)
-		end
-		return string.char(c)
-	end))
+local Http = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local Stats = game:GetService("Stats")
+local Players = game:GetService("Players")
+
+local file = "ttam_data.json"
+
+local data = { Don = "Full Gear" }
+if isfile and isfile(file) then
+	local ok, decoded = pcall(function()
+		return Http:JSONDecode(readfile(file))
+	end)
+	if ok then data = decoded end
 end
 
-local a = "aWYgbm90IGdhbWU6SXNMb2FkZWQoKSB0aGVuIGdhbWUuTG9hZGVkOldhaXQoKSBlbmQKbG9jYWwgSHR0cCA9IGdhbWU6R2V0U2VydmljZSgiSHR0cFNlcnZpY2UiKQpsb2NhbCBSdW5TZXJ2aWNlID0gZ2FtZTpHZXRTZXJ2aWNlKCJSdW5TZXJ2aWNlIikKbG9jYWwgU3RhdHMgPSBnYW1lOkdldFNlcnZpY2UoIlN0YXRzIikKbG9jYWwgUGxheWVycyA9IGdhbWU6R2V0U2VydmljZSgiUGxheWVycyIpCgpsb2NhbCBndWkgPSBJbnN0YW5jZS5uZXcoIlNjcmVlbkd1aSIpCmd1aS5OYW1lID0gIlRUQU1fR1VJIgpwY2FsbChmdW5jdGlvbigpIGd1aS5QYXJlbnQgPSBnYW1lOkdldFNlcnZpY2UoIkNvcmVHdWkiKSBlbmQpCgpsb2NhbCBmaWxlID0gInR0YW1fZGF0YS5qc29uIgoKbG9jYWwgZGF0YSA9IHsgRG9uID0gIkZ1bGwgR2VhciIgfQppZiBpc2ZpbGUgYW5kIGlzZmlsZShmaWxlKSB0aGVuCglsb2NhbCBvaywgZGVjb2RlZCA9IHBjYWxsKGZ1bmN0aW9uKCkgcmV0dXJuIEh0dHA6SlNPTkRlY29kZShyZWFkZmlsZShmaWxlKSkgZW5kKQoJaWYgb2sgdGhlbiBkYXRhID0gZGVjb2RlZCBlbmQKZW5kCgpsb2NhbCBmdW5jdGlvbiBzYXZlKCkKCWlmIHdyaXRlZmlsZSB0aGVuCgl3cml0ZWZpbGUoZmlsZSwgSHR0cDpKU09ORW5jb2RlKGRhdGEpKQoJZW5kCmVuZAoKbG9jYWwgZnVuY3Rpb24gaGlkZU5hbWUobmFtZSkKCWlmIG5vdCBuYW1lIHRoZW4gcmV0dXJuICIiIGVuZAoJaWYgI25hbWUgPiA2IHRoZW4KCQlyZXR1cm4gc3RyaW5nLnN1YihuYW1lLDEsNikuLiIqKioiCgllbHNlCgkJcmV0dXJuIHN0cmluZy5zdWIobmFtZSwxLDMpLi4iKioqIgoJZW5kCmVuZAoKbG9jYWwgZnJhbWUgPSBJbnN0YW5jZS5uZXcoIkZyYW1lIiwgZ3VpKQpmcmFtZS5TaXplID0gVURpbTIubmV3KDAsMjYwLDAsMTM1KQpmcmFtZS5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLjUsLTEzMCwwLjE4LDApCmZyYW1lLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigxNSwxNSwxNSkKZnJhbWUuQWN0aXZlID0gdHJ1ZQpmcmFtZS5EcmFnZ2FibGUgPSB0cnVlCkluc3RhbmNlLm5ldygiVUlDb3JuZXIiLCBmcmFtZSkKbG9jYWwgc3Ryb2tlID0gSW5zdGFuY2UubmV3KCJVSVN0cm9rZSIsIGZyYW1lKQpzdHJva2UuVGhpY2tuZXNzID0gMgoKbG9jYWwgdGl0bGUgPSBJbnN0YW5jZS5uZXcoIlRleHRMYWJlbCIsIGZyYW1lKQp0aXRsZS5TaXplID0gVURpbTIubmV3KDEsMCwwLDI0KQp0aXRsZS5UZXh0ID0gIlRUYW0gVGFiIgp0aXRsZS5CYWNrZ3JvdW5kVHJhbnNwYXJlbmN5ID0gMQp0aXRsZS5Gb250ID0gRW51bS5Gb250LkdvdGhhbUJvbGQKdGl0bGUuVGV4dFNjYWxlZCA9IHRydWUKCmxvY2FsIGluZm8gPSBJbnN0YW5jZS5uZXcoIlRleHRMYWJlbCIsIGZyYW1lKQppbmZvLlNpemUgPSBVRGltMi5uZXcoMSwtMTQsMCw3MCkKaW5mby5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLDcsMCwyNCkKaW5mby5CYWNrZ3JvdW5kVHJhbnNwYXJlbmN5ID0gMQppbmZvLkZvbnQgPSBFbnVtLkZvbnQuR290aGFtQm9sZAppbmZvLlRleHRTaXplID0gMTYKaW5mby5SaWNoVGV4dCA9IHRydWUKaW5mby5UZXh0WEFsaWdubWVudCA9IEVudW0uVGV4dFhBbGlnbm1lbnQuTGVmdAppbmZvLlRleHRZQWxpZ25tZW50ID0gRW51bS5UZXh0WUFsaWdubWVudC5Ub3AKCmxvY2FsIGJveCA9IEluc3RhbmNlLm5ldygiVGV4dEJveCIsIGZyYW1lKQpib3guU2l6ZSA9IFVEaW0yLm5ldygwLjU1LDAsMCwyMikKYm94LlBvc2l0aW9uID0gVURpbTIubmV3KDAuMDUsMCwxLC0yNikKYm94LlBsYWNlaG9sZGVyVGV4dCA9ICJUw6puIMSRxqFuLi4uIgpidXguQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDQwLDQwLDQwKQpidXguVGV4dENvbG9yMyA9IENvbG9yMy5uZXcoMSwxLDEpCkluc3RhbmNlLm5ldygiVUlDb3JuZXIiLCBib3gpCgpsb2NhbCBidG4gPSBJbnN0YW5jZS5uZXcoIlRleHRCdXR0b24iLCBmcmFtZSkKYnRuLlNpemUgPSBVRGltMi5uZXcoMC4zNSwwLDAsMjIpCmJ0bi5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLjYsMCwxLC0yNikKYnRuLlRleHQgPSAiU2F2ZSIKYnRuLlRleHRDb2xvcjMgPSBDb2xvcjMuTmV3KDEsMSwxKQpJbnN0YW5jZS5uZXcoIlVJQ29ybmVyIiwgYnRuKQoKYnRuLk1vdXNlQnV0dG9uMUNsaWNrOkNvbm5lY3QoZnVuY3Rpb24oKQppZiBib3guVGV4dCAhPSAiIiB0aGVuCglkYXRhLkRvbiA9IGJveC5UZXh0CglzYXZlKCkKZW5kCmVuZCkKbG9jYWwgdG9nZ2xlID0gSW5zdGFuY2UubmV3KCJUZXh0QnV0dG9uIiwgZ3VpKQp0b2dnbGUuU2l6ZSA9IFVEaW0yLm5ldygwLDU1LDAsMjYpCnRvZ2dsZS5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLDEwLDAsMTApCnRvZ2dsZS5UZXh0ID0gIlRhYiIKdG9nZ2xlLlRleHRDb2xvcjMgPSBDb2xvcjMuTmV3KDEsMSwxKQp0b2dnbGUuQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDMwLDMwLDMwKQpJbnN0YW5jZS5uZXcoIlVJQ29ybmVyIiwgdG9nZ2xlKQp0b2dnbGUuTW91c2VCdXR0b24xQ2xpY2s6Q29ubmVjdChmdW5jdGlvbigpCmZyYW1lLlZpc2libGUgPSBub3QgZnJhbWUuVmlzaWJsZQplbmQpCmxvY2FsIGxhc3QgPSB0aWNrKCkKbG9jYWwgZnBzID0gNjAKbG9jYWwgZnJhbWVzID0gMApsb2NhbCBjb2xvcnMgPSB7Q29sb3IzLmZyb21SR0IoMjU1LDAsMCksQ29sb3IzLmZyb21SR0IoMjU1LDEyNywwKSxDb2xvcjMuZnJvbVJHQigyNTUsMjU1LDApLENvbG9yMy5mcm9tUkdCKDAsMjU1LDApLENvbG9yMy5mcm9tUkdCKDAsMjU1LDI1NSksQ29sb3IzLmZyb21SR0IoMCwwLDI1NSksQ29sb3IzLmZyb21SR0IoMTM5LDAsMjU1KX0KbG9jYWwgaW5kZXggPSAxCmxvY2FsIGxhc3RTd2l0Y2ggPSB0aWNrKCkKUnVuU2VydmljZS5SZW5kZXJTdGVwcGVkOkNvbm5lY3QoZnVuY3Rpb24oKQpmcmFtZXMgKz0gMQppZiB0aWNrKCktbGFzdD49MSB0aGVuIGZwcyA9IGZyYW1lcyBmcmFtZXMgPSAwIGxhc3QgPSB0aWNrKCkgZW5kCmxvY2FsIHBpbmcgPSAwIHBjYWxsKGZ1bmN0aW9uKCkgcGluZyA9IG1hdGguZmxvb3IoU3RhdHMuTmV0d29yay5TZXJ2ZXJTdGF0c0l0ZW1bIkRhdGEgUGluZyJdOkdldFZhbHVlKCkpIGVuZCkKaWYgdGljaygpIC0gbGFzdFN3aXRjaCA+IDAuMjUgdGhlbiBpbmRleCArPSAxIGlmIGluZGV4ID4gI2NvbG9ycyB0aGVuIGluZGV4ID0gMSBlbmQgbGFzdFN3aXRjaCA9IHRpY2soKSBlbmQKbG9jYWwgY29sb3IgPSBjb2xvcnNbaW5kZXhdCnN0cm9rZS5Db2xvciA9IGNvbG9yIHRpdGxlLlRleHRDb2xvcjMgPSBjb2xvciB0b2dnbGUuQmFja2dyb3VuZENvbG9yMyA9IGNvbG9yCmluZm8uVGV4dCA9ICc8Zm9udCBjb2xvcj0iIzAwRkZGRiI+8J+RpCAnLi5oaWRlTmFtZShQbGF5ZXJzLkxvY2FsUGxheWVyLk5hbWUpLi4nPC9mb250PicuLic8YnI+PGZvbnQgY29sb3I9IiNGRjU1NTUiPuKalO+4jyAnLi5kYXRhLkRvbi4uJzwvZm9udD4nLi4nPGJyPjxmb250IGNvbG9yPSIjRkZGRjAwIj7wn5SlICcuLmZwcy4uJzwvZm9udD4gPGZvbnQgY29sb3I9IiMwMEZGMDAiPnwgJy4ucGluZy4uJ21zPC9mb250PicuLic8YnI+PGZvbnQgc2l6ZT0iMTciIGNvbG9yPSIjRkZGRkZGIj5QbGF5ZXI6ICcuLiNQbGF5ZXJzOkdldFBsYXllcnMoKS4uJy8nLi5QbGF5ZXJzLk1heFBsYXllcnMuLic8L2ZvbnQ+JwplbmQp"
-loadstring(decode(a))()
+local function save()
+	if writefile then
+		writefile(file, Http:JSONEncode(data))
+	end
+end
+
+local function hideName(name)
+	if not name then return "" end
+	if #name > 6 then
+		return string.sub(name,1,6).."***"
+	else
+		return string.sub(name,1,3).."***"
+	end
+end
+
+-- GUI
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "TTAM_GUI"
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0,260,0,135)
+frame.Position = UDim2.new(0.5,-130,0.18,0)
+frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
+frame.Active = true
+frame.Draggable = true
+Instance.new("UICorner", frame)
+
+local stroke = Instance.new("UIStroke", frame)
+stroke.Thickness = 2
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1,0,0,24)
+title.Text = "TTam Tab"
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+
+local info = Instance.new("TextLabel", frame)
+info.Size = UDim2.new(1,-14,0,70)
+info.Position = UDim2.new(0,7,0,24)
+info.BackgroundTransparency = 1
+info.Font = Enum.Font.GothamBold
+info.TextSize = 16
+info.RichText = true
+info.TextXAlignment = Enum.TextXAlignment.Left
+info.TextYAlignment = Enum.TextYAlignment.Top
+
+local box = Instance.new("TextBox", frame)
+box.Size = UDim2.new(0.55,0,0,22)
+box.Position = UDim2.new(0.05,0,1,-26)
+box.PlaceholderText = "Tên đơn..."
+box.BackgroundColor3 = Color3.fromRGB(40,40,40)
+box.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", box)
+
+local btn = Instance.new("TextButton", frame)
+btn.Size = UDim2.new(0.35,0,0,22)
+btn.Position = UDim2.new(0.6,0,1,-26)
+btn.Text = "Save"
+btn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", btn)
+
+btn.MouseButton1Click:Connect(function()
+	if box.Text ~= "" then
+		data.Don = box.Text
+		save()
+	end
+end)
+
+-- TAB
+local toggle = Instance.new("TextButton", gui)
+toggle.Size = UDim2.new(0,55,0,26)
+toggle.Position = UDim2.new(0,10,0,10)
+toggle.Text = "Tab"
+toggle.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", toggle)
+
+toggle.MouseButton1Click:Connect(function()
+	frame.Visible = not frame.Visible
+end)
+
+-- FPS
+local last = tick()
+local fps = 60
+local frames = 0
+
+local colors = {
+	Color3.fromRGB(255,0,0),
+	Color3.fromRGB(255,127,0),
+	Color3.fromRGB(255,255,0),
+	Color3.fromRGB(0,255,0),
+	Color3.fromRGB(0,255,255),
+	Color3.fromRGB(0,0,255),
+	Color3.fromRGB(139,0,255)
+}
+
+local index = 1
+local lastSwitch = tick()
+
+RunService.RenderStepped:Connect(function()
+	frames += 1
+	if tick()-last>=1 then
+		fps = frames
+		frames = 0
+		last = tick()
+	end
+
+	local ping = 0
+	pcall(function()
+		ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+	end)
+
+	if tick() - lastSwitch > 0.25 then
+		index += 1
+		if index > #colors then index = 1 end
+		lastSwitch = tick()
+	end
+
+	local color = colors[index]
+
+	stroke.Color = color
+	title.TextColor3 = color
+	toggle.BackgroundColor3 = color
+
+	info.Text =
+		'<font color="#00FFFF">👤 '..hideName(Players.LocalPlayer.Name)..'</font>'..
+		'\n<font color="#FF5555">⚔️ '..data.Don..'</font>'..
+		'\n<font color="#FFFF00">🔥 '..fps..'</font>'..
+		' <font color="#00FF00">| '..ping..'ms</font>'..
+		'\n\n<font size="17" color="#FFFFFF">Player: '..#Players:GetPlayers()..'/'..Players.MaxPlayers..'</font>'
+end)
