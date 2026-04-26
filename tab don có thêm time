@@ -145,7 +145,6 @@ local index = 1
 local lastSwitch = tick()
 
 RunService.RenderStepped:Connect(function()
-	-- FPS
 	frames += 1
 	if tick()-last>=1 then
 		fps = frames
@@ -153,13 +152,11 @@ RunService.RenderStepped:Connect(function()
 		last = tick()
 	end
 
-	-- PING
 	local ping = 0
 	pcall(function()
 		ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
 	end)
 
-	-- 🌈 TAB đổi màu
 	if tick() - lastSwitch > 0.25 then
 		index += 1
 		if index > #colors then index = 1 end
@@ -172,7 +169,6 @@ RunService.RenderStepped:Connect(function()
 	title.TextColor3 = tabColor
 	toggle.BackgroundColor3 = tabColor
 
-	-- MINI
 	local miniColor = Color3.new(1,1,1)
 	if ping > 150 then
 		miniColor = Color3.fromRGB(255,0,0)
@@ -180,13 +176,13 @@ RunService.RenderStepped:Connect(function()
 		miniColor = Color3.fromRGB(255,200,0)
 	end
 
-	-- ⏱ TIME
+	-- ⏱ TIME (giờ:phút:giây)
 	local elapsed = math.floor(tick() - joinTime)
-	local minutes = math.floor(elapsed / 60)
+	local hours = math.floor(elapsed / 3600)
+	local minutes = math.floor((elapsed % 3600) / 60)
 	local seconds = elapsed % 60
-	local timeText = string.format("%02d:%02d", minutes, seconds)
+	local timeText = string.format("%02d:%02d:%02d", hours, minutes, seconds)
 
-	-- TEXT (chỉ thêm time vào dòng tên)
 	info.Text =
 		'<font color="#00FFFF">👤 '..hideName(player.Name)..'</font>'..
 		'<font color="#AAAAFF">        ⏱ '..timeText..'</font>'..
