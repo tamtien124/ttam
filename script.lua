@@ -1,15 +1,14 @@
 -- FIX GUI TRÙNG (QUAN TRỌNG)
 pcall(function()
-	local old = game.CoreGui:FindFirstChild("TTAM_GUI")
+	local old = game.CoreGui:FindFirstChild("THBao_GUI")
 	if old then old:Destroy() end
 end)
 
 local Http = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
-local Stats = game:GetService("Stats")
 local Players = game:GetService("Players")
 
-local file = "ttam_data.json"
+local file = "thbao_data.json"
 
 local data = { Don = "Full Gear" }
 if isfile and isfile(file) then
@@ -34,13 +33,13 @@ local function hideName(name)
 	end
 end
 
--- GUI
+-- GUI SETUP
 local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "TTAM_GUI"
+gui.Name = "THBao_GUI"
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0,260,0,135)
-frame.Position = UDim2.new(0.5,-130,0.18,0)
+frame.Size = UDim2.new(0,240,0,110) -- Thu nhỏ lại cho gọn vì đã xóa bớt thông số
+frame.Position = UDim2.new(0.5,-120,0.18,0)
 frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
 frame.Active = true
 frame.Draggable = true
@@ -50,34 +49,36 @@ local stroke = Instance.new("UIStroke", frame)
 stroke.Thickness = 2
 
 local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1,0,0,24)
-title.Text = "TTam Tab"
+title.Size = UDim2.new(1,0,0,30)
+title.Text = "THBao Tab"
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
 title.TextScaled = true
 
 local info = Instance.new("TextLabel", frame)
-info.Size = UDim2.new(1,-14,0,70)
-info.Position = UDim2.new(0,7,0,24)
+info.Size = UDim2.new(1,-14,0,45)
+info.Position = UDim2.new(0,7,0,32)
 info.BackgroundTransparency = 1
 info.Font = Enum.Font.GothamBold
-info.TextSize = 16
+info.TextSize = 18
 info.RichText = true
 info.TextXAlignment = Enum.TextXAlignment.Left
 info.TextYAlignment = Enum.TextYAlignment.Top
 
 local box = Instance.new("TextBox", frame)
-box.Size = UDim2.new(0.55,0,0,22)
-box.Position = UDim2.new(0.05,0,1,-26)
+box.Size = UDim2.new(0.55,0,0,24)
+box.Position = UDim2.new(0.05,0,1,-32)
 box.PlaceholderText = "Tên đơn..."
 box.BackgroundColor3 = Color3.fromRGB(40,40,40)
 box.TextColor3 = Color3.new(1,1,1)
+box.Text = ""
 Instance.new("UICorner", box)
 
 local btn = Instance.new("TextButton", frame)
-btn.Size = UDim2.new(0.35,0,0,22)
-btn.Position = UDim2.new(0.6,0,1,-26)
+btn.Size = UDim2.new(0.32,0,0,24)
+btn.Position = UDim2.new(0.63,0,1,-32)
 btn.Text = "Save"
+btn.Font = Enum.Font.GothamBold
 btn.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", btn)
 
@@ -88,11 +89,12 @@ btn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- TAB
+-- NÚT TAB (MỞ/TẮT)
 local toggle = Instance.new("TextButton", gui)
-toggle.Size = UDim2.new(0,55,0,26)
+toggle.Size = UDim2.new(0,60,0,28)
 toggle.Position = UDim2.new(0,10,0,10)
 toggle.Text = "Tab"
+toggle.Font = Enum.Font.GothamBold
 toggle.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", toggle)
 
@@ -100,11 +102,7 @@ toggle.MouseButton1Click:Connect(function()
 	frame.Visible = not frame.Visible
 end)
 
--- FPS
-local last = tick()
-local fps = 60
-local frames = 0
-
+-- HIỆU ỨNG MÀU & CẬP NHẬT TEXT
 local colors = {
 	Color3.fromRGB(255,0,0),
 	Color3.fromRGB(255,127,0),
@@ -119,34 +117,20 @@ local index = 1
 local lastSwitch = tick()
 
 RunService.RenderStepped:Connect(function()
-	frames += 1
-	if tick()-last>=1 then
-		fps = frames
-		frames = 0
-		last = tick()
-	end
-
-	local ping = 0
-	pcall(function()
-		ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-	end)
-
+	-- Hiệu ứng đổi màu cầu vồng
 	if tick() - lastSwitch > 0.25 then
-		index += 1
+		index = index + 1
 		if index > #colors then index = 1 end
 		lastSwitch = tick()
 	end
 
 	local color = colors[index]
-
 	stroke.Color = color
 	title.TextColor3 = color
 	toggle.BackgroundColor3 = color
 
+	-- Chỉ hiển thị Tên và Đơn hàng
 	info.Text =
 		'<font color="#00FFFF">👤 '..hideName(Players.LocalPlayer.Name)..'</font>'..
-		'\n<font color="#FF5555">⚔️ '..data.Don..'</font>'..
-		'\n<font color="#FFFF00">🔥 '..fps..'</font>'..
-		' <font color="#00FF00">| '..ping..'ms</font>'..
-		'\n\n<font size="17" color="#FFFFFF">Player: '..#Players:GetPlayers()..'/'..Players.MaxPlayers..'</font>'
+		'\n<font color="#FF5555">⚔️ '..data.Don..'</font>'
 end)
