@@ -1,11 +1,133 @@
---[[ 
-    PROTECTED BY THBAO SYSTEM
-    ENCRYPTED VERSION
-]]
+-- [[ PROTECTED BY THBAO SYSTEM - EDITED ]] --
 
-local _0x746862616f = [=[
-local pcall=pcall;pcall(function() local old=game.CoreGui:FindFirstChild("THBao_GUI") if old then old:Destroy() end end) local Http=game:GetService("HttpService") local RunService=game:GetService("RunService") local Players=game:GetService("Players") local file="thbao_data.json" local data={Don="Full Gear"} if isfile and isfile(file) then local ok,decoded=pcall(function() return Http:JSONDecode(readfile(file)) end) if ok then data=decoded end end local function save() if writefile then writefile(file,Http:JSONEncode(data)) end end local function hideName(name) if not name then return "" end if #name>6 then return string.sub(name,1,6).."***" else return string.sub(name,1,3).."***" end end local gui=Instance.new("ScreenGui",game.CoreGui) gui.Name="THBao_GUI" local frame=Instance.new("Frame",gui) frame.Size=UDim2.new(0,240,0,110) frame.Position=UDim2.new(0.5,-120,0.18,0) frame.BackgroundColor3=Color3.fromRGB(15,15,15) frame.Active=true frame.Draggable=true Instance.new("UICorner",frame) local stroke=Instance.new("UIStroke",frame) stroke.Thickness=2 local title=Instance.new("TextLabel",frame) title.Size=UDim2.new(1,0,0,30) title.Text="THBao Tab" title.BackgroundTransparency=1 title.Font=Enum.Font.GothamBold title.TextScaled=true local info=Instance.new("TextLabel",frame) info.Size=UDim2.new(1,-14,0,45) info.Position=UDim2.new(0,7,0,32) info.BackgroundTransparency=1 info.Font=Enum.Font.GothamBold info.TextSize=18 info.RichText=true info.TextXAlignment=Enum.TextXAlignment.Left info.TextYAlignment=Enum.TextYAlignment.Top local box=Instance.new("TextBox",frame) box.Size=UDim2.new(0.55,0,0,24) box.Position=UDim2.new(0.05,0,1,-32) box.PlaceholderText="Tên đơn..." box.BackgroundColor3=Color3.fromRGB(40,40,40) box.TextColor3=Color3.new(1,1,1) box.Text="" Instance.new("UICorner",box) local btn=Instance.new("TextButton",frame) btn.Size=UDim2.new(0.32,0,0,24) btn.Position=UDim2.new(0.63,0,1,-32) btn.Text="Save" btn.Font=Enum.Font.GothamBold btn.TextColor3=Color3.new(1,1,1) Instance.new("UICorner",btn) btn.MouseButton1Click:Connect(function() if box.Text~="" then data.Don=box.Text save() end end) local toggle=Instance.new("TextButton",gui) toggle.Size=UDim2.new(0,60,0,28) toggle.Position=UDim2.new(0,10,0,10) toggle.Text="Tab" toggle.Font=Enum.Font.GothamBold toggle.TextColor3=Color3.new(1,1,1) Instance.new("UICorner",toggle) toggle.MouseButton1Click:Connect(function() frame.Visible=not frame.Visible end) local colors={Color3.fromRGB(255,0,0),Color3.fromRGB(255,127,0),Color3.fromRGB(255,255,0),Color3.fromRGB(0,255,0),Color3.fromRGB(0,255,255),Color3.fromRGB(0,0,255),Color3.fromRGB(139,0,255)} local index=1 local lastSwitch=tick() RunService.RenderStepped:Connect(function() if tick()-lastSwitch>0.25 then index=index+1 if index>#colors then index=1 end lastSwitch=tick() end local color=colors[index] stroke.Color=color title.TextColor3=color toggle.BackgroundColor3=color info.Text='<font color="#00FFFF">👤 '..hideName(Players.LocalPlayer.Name)..'</font>'..'\n<font color="#FF5555">⚔️ '..data.Don..'</font>' end)
-]=]
+pcall(function()
+    local old = game.CoreGui:FindFirstChild("THBao_GUI")
+    if old then old:Destroy() end
+end)
 
-local _0x52756e = loadstring or function(...) return error("Executor not supported") end
-_0x52756e(_0x746862616f)()
+local Http = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+
+local file = "thbao_data.json"
+local data = {Don = "Full Gear"}
+
+if isfile and isfile(file) then
+    local ok, decoded = pcall(function()
+        return Http:JSONDecode(readfile(file))
+    end)
+    if ok then data = decoded end
+end
+
+local function save()
+    if writefile then
+        writefile(file, Http:JSONEncode(data))
+    end
+end
+
+local function hideName(name)
+    if not name then return "" end
+    if #name > 6 then
+        return string.sub(name,1,6).."***"
+    else
+        return string.sub(name,1,3).."***"
+    end
+end
+
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "THBao_GUI"
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0,240,0,110)
+frame.Position = UDim2.new(0.5,-120,0.18,0)
+frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
+frame.Active = true
+frame.Draggable = true
+Instance.new("UICorner", frame)
+
+local stroke = Instance.new("UIStroke", frame)
+stroke.Thickness = 2
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1,0,0,30)
+title.Text = "THBao Tab"
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+
+local info = Instance.new("TextLabel", frame)
+info.Size = UDim2.new(1,-14,0,45)
+info.Position = UDim2.new(0,7,0,32)
+info.BackgroundTransparency = 1
+info.Font = Enum.Font.GothamBold
+info.TextSize = 18
+info.RichText = true
+info.TextXAlignment = Enum.TextXAlignment.Left
+info.TextYAlignment = Enum.TextYAlignment.Top
+
+local box = Instance.new("TextBox", frame)
+box.Size = UDim2.new(0.55,0,0,24)
+box.Position = UDim2.new(0.05,0,1,-32)
+box.PlaceholderText = "Tên đơn..."
+box.BackgroundColor3 = Color3.fromRGB(40,40,40)
+box.TextColor3 = Color3.new(1,1,1)
+box.Text = ""
+Instance.new("UICorner", box)
+
+local btn = Instance.new("TextButton", frame)
+btn.Size = UDim2.new(0.32,0,0,24)
+btn.Position = UDim2.new(0.63,0,1,-32)
+btn.Text = "Save"
+btn.Font = Enum.Font.GothamBold
+btn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", btn)
+
+btn.MouseButton1Click:Connect(function()
+    if box.Text ~= "" then
+        data.Don = box.Text
+        save()
+    end
+end)
+
+local toggle = Instance.new("TextButton", gui)
+toggle.Size = UDim2.new(0,60,0,28)
+toggle.Position = UDim2.new(0,10,0,10)
+toggle.Text = "Tab"
+toggle.Font = Enum.Font.GothamBold
+toggle.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", toggle)
+
+toggle.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible
+end)
+
+local colors = {
+    Color3.fromRGB(255,0,0),
+    Color3.fromRGB(255,127,0),
+    Color3.fromRGB(255,255,0),
+    Color3.fromRGB(0,255,0),
+    Color3.fromRGB(0,255,255),
+    Color3.fromRGB(0,0,255),
+    Color3.fromRGB(139,0,255)
+}
+
+local index = 1
+local lastSwitch = tick()
+
+RunService.RenderStepped:Connect(function()
+    if tick() - lastSwitch > 0.25 then
+        index = index + 1
+        if index > #colors then index = 1 end
+        lastSwitch = tick()
+    end
+
+    local color = colors[index]
+    stroke.Color = color
+    title.TextColor3 = color
+    toggle.BackgroundColor3 = color
+
+    -- ĐÃ XÓA ICON Ở ĐÂY
+    info.Text =
+        '<font color="#00FFFF">'..hideName(Players.LocalPlayer.Name)..'</font>'
+        ..'\n<font color="#FF5555">'..data.Don..'</font>'
+end)
