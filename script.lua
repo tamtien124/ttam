@@ -1,222 +1,97 @@
---// =========================
---// 🔥 TTAM ULTIMATE INTRO
---// =========================
-
-local Lighting = game:GetService("Lighting")
-local TweenService = game:GetService("TweenService")
-local SoundService = game:GetService("SoundService")
-local UserInputService = game:GetService("UserInputService")
-
--- Blur nền
-local blur = Instance.new("BlurEffect")
-blur.Size = 0
-blur.Parent = Lighting
-
--- GUI Intro
-local intro = Instance.new("ScreenGui", game.CoreGui)
-intro.Name = "TTAM_ULTIMATE"
-
-local bg = Instance.new("Frame", intro)
-bg.Size = UDim2.new(1,0,1,0)
-bg.BackgroundColor3 = Color3.fromRGB(10,10,10)
-bg.BackgroundTransparency = 1
-
-local logo = Instance.new("TextLabel", bg)
-logo.Size = UDim2.new(0,120,0,120)
-logo.Position = UDim2.new(0.5,-60,0.38,-60)
-logo.BackgroundTransparency = 1
-logo.Text = "💎"
-logo.TextScaled = true
-logo.TextTransparency = 1
-
-local title = Instance.new("TextLabel", bg)
-title.Size = UDim2.new(1,0,0,40)
-title.Position = UDim2.new(0,0,0.52,0)
-title.BackgroundTransparency = 1
-title.Text = "TTam"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 30
-title.TextColor3 = Color3.fromRGB(255,0,255)
-title.TextTransparency = 1
-
-local sub = Instance.new("TextLabel", bg)
-sub.Size = UDim2.new(1,0,0,30)
-sub.Position = UDim2.new(0,0,0.58,0)
-sub.BackgroundTransparency = 1
-sub.Text = "Loading modules..."
-sub.Font = Enum.Font.Gotham
-sub.TextSize = 14
-sub.TextColor3 = Color3.fromRGB(180,180,180)
-sub.TextTransparency = 1
-
-local barBG = Instance.new("Frame", bg)
-barBG.Size = UDim2.new(0,220,0,6)
-barBG.Position = UDim2.new(0.5,-110,0.65,0)
-barBG.BackgroundColor3 = Color3.fromRGB(40,40,40)
-barBG.BackgroundTransparency = 1
-Instance.new("UICorner", barBG)
-
-local bar = Instance.new("Frame", barBG)
-bar.Size = UDim2.new(0,0,1,0)
-bar.BackgroundColor3 = Color3.fromRGB(255,0,255)
-Instance.new("UICorner", bar)
-
--- Sound
-local sound = Instance.new("Sound")
-sound.SoundId = "rbxassetid://9118828563"
-sound.Volume = 0.5
-sound.Parent = SoundService
-sound:Play()
-
--- Animation
-TweenService:Create(bg, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
-TweenService:Create(logo, TweenInfo.new(0.5), {TextTransparency = 0}):Play()
-TweenService:Create(title, TweenInfo.new(0.5), {TextTransparency = 0}):Play()
-TweenService:Create(sub, TweenInfo.new(0.5), {TextTransparency = 0}):Play()
-TweenService:Create(barBG, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
-TweenService:Create(blur, TweenInfo.new(0.5), {Size = 18}):Play()
-
-task.wait(0.5)
-TweenService:Create(bar, TweenInfo.new(1.5, Enum.EasingStyle.Quad), {Size = UDim2.new(1,0,1,0)}):Play()
-task.wait(2)
-
-TweenService:Create(bg, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
-TweenService:Create(logo, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
-TweenService:Create(title, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
-TweenService:Create(sub, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
-TweenService:Create(barBG, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
-TweenService:Create(blur, TweenInfo.new(0.5), {Size = 0}):Play()
-
-task.wait(0.6)
-blur:Destroy()
-intro:Destroy()
-
---// UI CHÍNH
-for _, v in pairs(game.CoreGui:GetChildren()) do if v.Name == "TTAM_V17" then v:Destroy() end end
-
-local Http = game:GetService("HttpService")
-local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
 local player = Players.LocalPlayer
 
-local function maskName(str) return #str > 10 and str:sub(1,10) .. "***" or str:sub(1,5) .. "***" end
-local displayName = maskName(player.Name)
-local fileName = "ttam_v17_" .. player.UserId .. ".json"
-local data = {Don = "Chưa nhập đơn", Status = "ĐANG XỬ LÝ"}
+-- Tạo ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CustomHUD"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
 
-if isfile and isfile(fileName) then pcall(function() data = Http:JSONDecode(readfile(fileName)) end) end
-local function save() if writefile then writefile(fileName, Http:JSONEncode(data)) end end
+-- Khung nền đen bo tròn (Đặt ở góc trên bên phải)
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 270, 0, 36)
+-- Canh vị trí góc trên bên phải (cách lề phải 15px, cách lề trên 15px)
+mainFrame.Position = UDim2.new(1, -285, 0, 15)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
 
-local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "TTAM_V17"
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(1, 0)
+uiCorner.Parent = mainFrame
 
-local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0,175,0,70)
-main.Position = UDim2.new(0.5,-87,0.2,0)
-main.BackgroundColor3 = Color3.fromRGB(10,10,10)
-main.Active = true
-main.Draggable = true
-Instance.new("UICorner", main)
+-- UIListLayout sắp xếp các thành phần nằm ngang
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.Parent = mainFrame
+uiListLayout.FillDirection = Enum.FillDirection.Horizontal
+uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uiListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+uiListLayout.Padding = UDim.new(0, 8)
 
-local stroke = Instance.new("UIStroke", main)
-stroke.Thickness = 2
-stroke.Color = Color3.fromRGB(255,0,255)
-RunService.RenderStepped:Connect(function() stroke.Transparency = 0.3 + math.sin(tick()*2)*0.2 end)
+-- Hàm tạo TextLabel gọn gàng
+local function createTextLabel(name, order)
+    local label = Instance.new("TextLabel")
+    label.Name = name
+    label.Size = UDim2.new(0, 80, 1, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextSize = 13
+    label.Font = Enum.Font.GothamBold
+    label.TextScaled = true
+    label.LayoutOrder = order
+    label.Parent = mainFrame
+    return label
+end
 
-local settingsBtn = Instance.new("TextButton", main)
-settingsBtn.Size = UDim2.new(0,22,0,22)
-settingsBtn.Position = UDim2.new(1,-26,0,4)
-settingsBtn.BackgroundTransparency = 1
-settingsBtn.Text = "⚡"
-settingsBtn.TextColor3 = Color3.new(1,1,1)
-settingsBtn.Font = Enum.Font.GothamBold
-settingsBtn.TextScaled = true
-settingsBtn.ZIndex = 5 -- Đảm bảo nút cài đặt luôn nằm trên cùng
+-- 1. FPS Label (Xanh lá)
+local fpsLabel = createTextLabel("FPSLabel", 1)
+fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
 
-local infoContent = Instance.new("TextLabel", main)
-infoContent.Size = UDim2.new(1,-12,1,-10)
-infoContent.Position = UDim2.new(0,10,0,5)
-infoContent.BackgroundTransparency = 1
-infoContent.Font = Enum.Font.GothamBold
-infoContent.TextColor3 = Color3.new(1,1,1)
-infoContent.TextScaled = true
-infoContent.RichText = true
-infoContent.TextXAlignment = Enum.TextXAlignment.Left
-infoContent.TextYAlignment = Enum.TextYAlignment.Top
+-- 2. Playtime Label (Thời gian treo trong server - Trắng)
+local playtimeLabel = createTextLabel("PlaytimeLabel", 2)
 
--- Resize (Hỗ trợ tốt cho cả PC & Mobile)
-local resizeBtn = Instance.new("ImageButton", main)
-resizeBtn.Size = UDim2.new(0,14,0,14)
-resizeBtn.Position = UDim2.new(1,-14,1,-14)
-resizeBtn.BackgroundTransparency = 1
-resizeBtn.Image = "rbxassetid://12124504104"
-resizeBtn.ImageColor3 = Color3.fromRGB(255,0,255)
-resizeBtn.ZIndex = 5
+-- 3. Name Label (Che 3 kí tự đầu - Xanh lá)
+local nameLabel = createTextLabel("NameLabel", 3)
+nameLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
 
-local dragging, startPos, startSize
-resizeBtn.InputBegan:Connect(function(input) 
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then 
-        dragging = true
-        startPos = input.Position
-        startSize = main.Size 
-    end 
-end)
+local displayName = player.Name
+if #displayName > 3 then
+    nameLabel.Text = "***" .. string.sub(displayName, 4)
+else
+    nameLabel.Text = "***"
+end
 
-UserInputService.InputChanged:Connect(function(input) 
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then 
-        local delta = input.Position - startPos
-        -- Giới hạn kích thước tối thiểu để không bị lỗi menu ẩn bên trong
-        main.Size = UDim2.new(0, math.max(160, startSize.X.Offset + delta.X), 0, math.max(70, startSize.Y.Offset + delta.Y)) 
-    end 
-end)
+-- Biến tính toán FPS và Thời gian treo server
+local lastTime = tick()
+local frameCount = 0
 
-UserInputService.InputEnded:Connect(function(input) 
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then 
-        dragging = false 
-    end 
-end)
+local totalSeconds = 0
+local lastTick = tick()
 
--- Settings Frame (Sửa lỗi hiển thị đè và tràn nút)
-local setFrame = Instance.new("Frame", main)
-setFrame.Size = UDim2.new(1, 0, 1, 0)
-setFrame.BackgroundColor3 = Color3.fromRGB(20,20,20)
-setFrame.Visible = false
-setFrame.ZIndex = 3
-Instance.new("UICorner", setFrame)
-
-local list = Instance.new("UIListLayout", setFrame)
-list.Padding = UDim.new(0,4)
-list.HorizontalAlignment = Enum.HorizontalAlignment.Center
-list.VerticalAlignment = Enum.VerticalAlignment.Center
-
-local boxDon = Instance.new("TextBox", setFrame)
-boxDon.Size = UDim2.new(0.85, 0, 0.35, 0)
-boxDon.PlaceholderText = "Nhập đơn rồi Enter..."
-boxDon.BackgroundColor3 = Color3.fromRGB(45,45,45)
-boxDon.TextColor3 = Color3.new(1,1,1)
-boxDon.Font = Enum.Font.GothamBold
-boxDon.TextScaled = true
-boxDon.ZIndex = 4
-Instance.new("UICorner", boxDon)
-
-local statusBtn = Instance.new("TextButton", setFrame)
-statusBtn.Size = UDim2.new(0.85, 0, 0.3, 0)
-statusBtn.Text = "Đổi Trạng Thái"
-statusBtn.BackgroundColor3 = Color3.fromRGB(0,120,215)
-statusBtn.TextColor3 = Color3.new(1,1,1)
-statusBtn.Font = Enum.Font.GothamBold
-statusBtn.TextScaled = true
-statusBtn.ZIndex = 4
-Instance.new("UICorner", statusBtn)
-
-settingsBtn.MouseButton1Click:Connect(function() setFrame.Visible = not setFrame.Visible end)
-boxDon.FocusLost:Connect(function() if boxDon.Text ~= "" then data.Don = boxDon.Text; save(); boxDon.Text = ""; setFrame.Visible = false end end)
-statusBtn.MouseButton1Click:Connect(function() data.Status = (data.Status == "ĐANG XỬ LÝ") and "HOÀN THÀNH" or "ĐANG XỬ LÝ"; save(); setFrame.Visible = false end)
-
--- UPDATE TEXT 
 RunService.RenderStepped:Connect(function()
-    infoContent.Text = 
-        '<font color="#FF00FF">'..displayName..'</font>\n'..
-        '<font color="#AAAAAA">Đơn:</font> <font color="#00FF00">'..data.Don..'</font>\n'..
-        '<font color="#FFD700">'..data.Status..'</font>'
+    frameCount = frameCount + 1
+    local currentTime = tick()
+    
+    -- Cập nhật FPS mỗi giây
+    if currentTime - lastTime >= 1 then
+        fpsLabel.Text = math.floor(frameCount / (currentTime - lastTime)) .. " FPS"
+        frameCount = 0
+        lastTime = currentTime
+    end
+    
+    -- Cập nhật thời gian treo trong server (đếm lên)
+    if currentTime - lastTick >= 1 then
+        totalSeconds = totalSeconds + 1
+        lastTick = currentTime
+        
+        local hours = math.floor(totalSeconds / 3600)
+        local minutes = math.floor((totalSeconds % 3600) / 60)
+        local seconds = totalSeconds % 60
+        
+        playtimeLabel.Text = string.format("%02dh:%02dm:%02ds", hours, minutes, seconds)
+    end
 end)
